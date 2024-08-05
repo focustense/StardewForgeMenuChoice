@@ -1,36 +1,38 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <Import Project="..\..\csproj_common" />
-
   <PropertyGroup>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <TargetFramework>net6.0</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <WarningsAsErrors>Nullable</WarningsAsErrors>
     <EnableHarmony>True</EnableHarmony>
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   
   <PropertyGroup>
+    <Authors>atravita,focustense</Authors>
+    <MinimumApiVersion>4.0.5</MinimumApiVersion>
+    <UniqueId>$(Authors).$(AssemblyName)</UniqueId>
+    <EntryDll>$(AssemblyName).dll</EntryDll>
     <Name>Pick Your Enchantment</Name>
     <Description>Allows you to pick which enchantment you get.</Description>
     <UpdateKeys> Nexus:11376, ModDrop:1125882 </UpdateKeys>
     <Version>1.2.0</Version>
-    <BaseManifest>..\..\base_dependencies.json</BaseManifest>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\..\AtraCore\AtraCore.csproj" Private="false" />
-    <ProjectReference Include="..\..\Pintail\Pintail\Pintail.csproj" Private="false" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
+        <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
+    </ItemGroup>
 
   <ItemGroup>
     <Using Include="StardewValley" />
+    <Using Include="StardewValley.Enchantments" />
     <Using Include="StardewModdingAPI" />
     <Using Include="System.Diagnostics.CodeAnalysis" />
-    <Using Include="JetBrains.Annotations" />
     <Using Alias="NotNullAttribute" Include="System.Diagnostics.CodeAnalysis.NotNullAttribute" />
     <Using Alias="Object" Include="System.Object" />
     <Using Alias="SObject" Include="StardewValley.Object" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="JetBrains.Annotations" Version="2023.3.0" />
   </ItemGroup>
 
 </Project>
