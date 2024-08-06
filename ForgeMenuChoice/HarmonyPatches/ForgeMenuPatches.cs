@@ -47,7 +47,7 @@ internal static class ForgeMenuPatches
     /// <param name="e">Buttons.</param>
     internal static void ApplyButtonPresses(ButtonsChangedEventArgs e)
     {
-        if (Menu is null || LastButtonPressTicks.Value + 15 < Game1.ticks)
+        if (Menu is null || LastButtonPressTicks.Value + 15 > Game1.ticks)
         {
             return;
         }
