@@ -1,38 +1,39 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <TargetFramework>net6.0</TargetFramework>
-    <LangVersion>latest</LangVersion>
-    <Nullable>enable</Nullable>
-    <WarningsAsErrors>Nullable</WarningsAsErrors>
-    <EnableHarmony>True</EnableHarmony>
-    <ImplicitUsings>enable</ImplicitUsings>
+	<PackageLicenseExpression>MIT</PackageLicenseExpression>
+	<TargetFramework>net6.0</TargetFramework>
+	<LangVersion>latest</LangVersion>
+	<Nullable>enable</Nullable>
+	<WarningsAsErrors>Nullable</WarningsAsErrors>
+	<EnableHarmony>True</EnableHarmony>
+	<ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
   
   <PropertyGroup>
-    <Authors>atravita,focustense</Authors>
-    <MinimumApiVersion>4.0.5</MinimumApiVersion>
-    <UniqueId>$(Authors).$(AssemblyName)</UniqueId>
-    <EntryDll>$(AssemblyName).dll</EntryDll>
-    <Name>Pick Your Enchantment</Name>
-    <Description>Allows you to pick which enchantment you get.</Description>
-    <UpdateKeys> Nexus:11376, ModDrop:1125882 </UpdateKeys>
-    <Version>1.2.0</Version>
+	<Authors>atravita</Authors>
+	<MinimumApiVersion>4.0.5</MinimumApiVersion>
+	<UniqueId>$(Authors).$(AssemblyName)</UniqueId>
+	<EntryDll>$(AssemblyName).dll</EntryDll>
+	<Name>Pick Your Enchantment</Name>
+	<Description>Allows you to pick which enchantment you get.</Description>
+	<UpdateKeys> Nexus:11376, ModDrop:1125882 </UpdateKeys>
+	<Version>1.2.0</Version>
   </PropertyGroup>
 
-    <ItemGroup>
-        <PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
-        <PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
-    </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Pathoschild.Stardew.ModBuildConfig" Version="4.1.1" />
+		<PackageReference Include="Pathoschild.Stardew.ModTranslationClassBuilder" Version="2.0.1" />
+		<PackageReference Include="Leclair.Stardew.ModManifestBuilder" Version="2.1.0" />
+	</ItemGroup>
 
   <ItemGroup>
-    <Using Include="StardewValley" />
-    <Using Include="StardewValley.Enchantments" />
-    <Using Include="StardewModdingAPI" />
-    <Using Include="System.Diagnostics.CodeAnalysis" />
-    <Using Alias="NotNullAttribute" Include="System.Diagnostics.CodeAnalysis.NotNullAttribute" />
-    <Using Alias="Object" Include="System.Object" />
-    <Using Alias="SObject" Include="StardewValley.Object" />
+	<Using Include="StardewValley" />
+	<Using Include="StardewValley.Enchantments" />
+	<Using Include="StardewModdingAPI" />
+	<Using Include="System.Diagnostics.CodeAnalysis" />
+	<Using Alias="NotNullAttribute" Include="System.Diagnostics.CodeAnalysis.NotNullAttribute" />
+	<Using Alias="Object" Include="System.Object" />
+	<Using Alias="SObject" Include="StardewValley.Object" />
   </ItemGroup>
 
 </Project>

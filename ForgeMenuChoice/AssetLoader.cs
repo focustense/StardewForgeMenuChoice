@@ -1,15 +1,8 @@
-﻿using AtraBase.Toolkit.StringHandler;
-
-using AtraShared.Utils.Extensions;
-
-using Microsoft.Xna.Framework.Graphics;
-
+﻿using Microsoft.Xna.Framework.Graphics;
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
-
 using StardewValley.Enchantments;
-
-using AtraUtils = AtraShared.Utils.Utils;
+using System.Globalization;
 
 namespace ForgeMenuChoice;
 
@@ -103,11 +96,11 @@ public static class AssetLoader
                 return tooltipdata;
             }
 
-            StreamSplit secretNote8 = note.StreamSplit('^', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+            string[] secretNote8 = note.Split('^', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             // The secret note, of course, has its data in the localized name. We'll need to map that to the internal name.
             // Using a dictionary with a StringComparer for the user's current language to make that a little easier.
-            Dictionary<string, string> tooltipmap = new(AtraUtils.GetCurrentLanguageComparer(ignoreCase: true));
+            Dictionary<string, string> tooltipmap = new(GetCurrentLanguageComparer());
             foreach (ReadOnlySpan<char> str in secretNote8)
             {
                 // Asian languages use a different colon.
@@ -123,7 +116,8 @@ public static class AssetLoader
             // Russian needs to be handled separately.
             foreach (BaseEnchantment enchantment in BaseEnchantment.GetAvailableEnchantments())
             {
-                if (ModEntry.TranslationHelper.TryGetTranslation("enchantment." + enchantment.GetName(), out Translation i18nname))
+                Translation i18nname = ModEntry.TranslationHelper.Get("enchantment." + enchantment.GetName());
+                if (i18nname.HasValue())
                 {
                     tooltipdata[enchantment.GetName()] = i18nname;
                 }
@@ -146,9 +140,23 @@ public static class AssetLoader
         }
         catch (Exception ex)
         {
-            ModEntry.ModMonitor.LogError("reading tooltip data from journal scrap 9", ex);
+            ModEntry.ModMonitor.Log($"Error reading tooltip data from journal scrap 9:\n\n{ex}", LogLevel.Error);
         }
         return tooltipdata;
+    }
+
+    private static StringComparer GetCurrentLanguageComparer(bool ignoreCase = false)
+    {
+        CultureInfo currentCulture;
+        try
+        {
+            currentCulture = new(LocalizedContentManager.LanguageCodeString(Game1.content.GetCurrentLanguage()));
+        }
+        catch (CultureNotFoundException)
+        {
+            currentCulture = CultureInfo.CurrentCulture;
+        }
+        return StringComparer.Create(currentCulture, ignoreCase);
     }
 
     private static Dictionary<string, string> GrabAndWrapTooltips()
@@ -156,7 +164,7 @@ public static class AssetLoader
         Dictionary<string, string> tooltips = Game1.temporaryContent.Load<Dictionary<string, string>>(tooltipDataPath.BaseName);
         foreach ((string k, string v) in tooltips)
         {
-            tooltips[k] = ModEntry.StringUtils.ParseAndWrapText(v, Game1.smallFont, 300);
+            tooltips[k] = Game1.parseText(v, Game1.smallFont, 300);
         }
         return tooltips;
     }

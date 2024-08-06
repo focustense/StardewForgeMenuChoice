@@ -1,17 +1,7 @@
-﻿using System.Reflection;
-using System.Reflection.Emit;
-
-using AtraBase.Toolkit.Reflection;
-
-using AtraCore.Framework.ReflectionManager;
-
-using AtraShared.Utils.Extensions;
-
-using AtraShared.Utils.HarmonyHelper;
-using HarmonyLib;
-
-using StardewValley.Enchantments;
+﻿using HarmonyLib;
 using StardewValley.Tools;
+using System.Reflection;
+using System.Reflection.Emit;
 
 namespace ForgeMenuChoice.HarmonyPatches;
 
@@ -22,26 +12,6 @@ namespace ForgeMenuChoice.HarmonyPatches;
 [HarmonyPatch(typeof(Tool))]
 internal static class GetEnchantmentPatch
 {
-    /// <summary>
-    /// Applies a patch against EnchantableScythes.
-    /// </summary>
-    /// <param name="harmony">My harmony instance.</param>
-    internal static void ApplyPatch(Harmony harmony)
-    {
-        try
-        {
-            Type scythePatcher = AccessTools.TypeByName("ScytheFixes.Patcher")
-                ?? ReflectionThrowHelper.ThrowMethodNotFoundException<Type>("EnchantableScythes");
-            harmony.Patch(
-                original: scythePatcher.GetCachedMethod("Forge_Post", ReflectionCache.FlagTypes.StaticFlags),
-                transpiler: new HarmonyMethod(typeof(GetEnchantmentPatch), nameof(Transpiler)));
-        }
-        catch (Exception ex)
-        {
-            ModEntry.ModMonitor.LogError("transpiling EnchantableScythes", ex);
-        }
-    }
-
     /// <summary>
     /// Function that substitutes in an enchantment.
     /// </summary>
@@ -61,7 +31,7 @@ internal static class GetEnchantmentPatch
         }
         catch (Exception ex)
         {
-            ModEntry.ModMonitor.LogError("forcing selection of enchantment", ex);
+            ModEntry.ModMonitor.Log($"Failed in forcing selection of enchantment.\n\n{ex}", LogLevel.Error);
         }
         return BaseEnchantment.GetEnchantmentFromItem(base_item, item);
     }
@@ -83,27 +53,27 @@ internal static class GetEnchantmentPatch
     {
         try
         {
-            ILHelper helper = new(original, instructions, ModEntry.ModMonitor, gen);
-            helper.FindFirst(
-            [
-                new(OpCodes.Ldarg_0),
-                new(SpecialCodeInstructionCases.LdArg),
-                new(OpCodes.Call, typeof(BaseEnchantment).GetCachedMethod(nameof(BaseEnchantment.GetEnchantmentFromItem), ReflectionCache.FlagTypes.StaticFlags)),
-                new(SpecialCodeInstructionCases.StLoc),
-                new(SpecialCodeInstructionCases.LdLoc),
-            ])
-            .Advance(2)
-            .ReplaceOperand(typeof(GetEnchantmentPatch).GetCachedMethod(nameof(SubstituteEnchantment), ReflectionCache.FlagTypes.StaticFlags))
-            .FindNext(
-                [
-                    new(OpCodes.Call, typeof(MeleeWeapon).GetCachedMethod(nameof(MeleeWeapon.attemptAddRandomInnateEnchantment), ReflectionCache.FlagTypes.StaticFlags))
-                ])
-            .ReplaceOperand(typeof(GetEnchantmentPatch).GetCachedMethod(nameof(SubstituteInnateEnchantment), ReflectionCache.FlagTypes.StaticFlags));
-            return helper.Render();
+            MethodInfo getEnchantmentFromItemInfo = AccessTools.Method(typeof(BaseEnchantment), nameof(BaseEnchantment.GetEnchantmentFromItem));
+            MethodInfo substituteEnchantmentInfo = AccessTools.Method(typeof(GetEnchantmentPatch), nameof(SubstituteEnchantment));
+            MethodInfo attemptAddRandomInnateEnchantmentInfo = AccessTools.Method(typeof(MeleeWeapon), nameof(MeleeWeapon.attemptAddRandomInnateEnchantment));
+            MethodInfo substituteInnateEnchantmentInfo = AccessTools.Method(typeof(GetEnchantmentPatch), nameof(SubstituteInnateEnchantment));
+
+            return new CodeMatcher(instructions)
+                .MatchStartForward(
+                    new CodeMatch(OpCodes.Ldarg_0),
+                    new CodeMatch(OpCodes.Ldarg_1),
+                    new CodeMatch(OpCodes.Call, getEnchantmentFromItemInfo),
+                    new CodeMatch(OpCodes.Stloc_0),
+                    new CodeMatch(OpCodes.Ldloc_0))
+                .Advance(2)
+                .SetInstruction(new(OpCodes.Call, substituteEnchantmentInfo))
+                .MatchStartForward(new CodeMatch(OpCodes.Call, attemptAddRandomInnateEnchantmentInfo))
+                .SetInstruction(new(OpCodes.Call, substituteInnateEnchantmentInfo))
+                .InstructionEnumeration();
         }
         catch (Exception ex)
         {
-            ModEntry.ModMonitor.LogTranspilerError(original, ex);
+            ModEntry.ModMonitor.Log($"Ran into errors transpiling {original.FullDescription()} to use selection.\n\n{ex}", LogLevel.Error);
         }
         return null;
     }

@@ -1,11 +1,6 @@
-﻿using System.Runtime.CompilerServices;
-
-using AtraShared.Utils.Extensions;
-
-using Microsoft.Xna.Framework;
+﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
-using StardewValley.Enchantments;
+using System.Runtime.CompilerServices;
 using StardewValley.Menus;
 
 namespace ForgeMenuChoice;
@@ -49,7 +44,7 @@ internal sealed class ForgeSelectionMenu : IClickableMenu
         this.Tool = tool;
         this.IsInnate = isInnate;
 
-        this.inherentWidth = (int)ModEntry.StringUtils.MeasureWord(Game1.dialogueFont, "Matador de Insetos") + 12;
+        this.inherentWidth = (int)MathF.Ceiling(Game1.dialogueFont.MeasureString("Matador de Insetos").X) + 12;
 
         this.backButton = this.GetBackButton();
         this.forwardButton = this.GetForwardButton();
@@ -132,7 +127,7 @@ internal sealed class ForgeSelectionMenu : IClickableMenu
         }
         catch (Exception ex)
         {
-            ModEntry.ModMonitor.LogError("left clicking on smol menu", ex);
+            ModEntry.ModMonitor.Log($"Failed while trying to process a left click on smol menu.\n\n{ex}", LogLevel.Error);
         }
     }
 
@@ -154,7 +149,7 @@ internal sealed class ForgeSelectionMenu : IClickableMenu
         }
         catch (Exception ex)
         {
-            ModEntry.ModMonitor.LogError("adjusting window size for smol menu", ex);
+            ModEntry.ModMonitor.Log($"Failed in trying to adjust window size for smol menu\n{ex}", LogLevel.Error);
         }
     }
 
@@ -180,7 +175,7 @@ internal sealed class ForgeSelectionMenu : IClickableMenu
         }
         catch (Exception ex)
         {
-            ModEntry.ModMonitor.LogError("hovering on smol menu", ex);
+            ModEntry.ModMonitor.Log($"Ran into errors handling hover on smol menu.\n{ex}", LogLevel.Error);
         }
     }
 
@@ -194,7 +189,7 @@ internal sealed class ForgeSelectionMenu : IClickableMenu
         try
         {
             base.draw(b);
-            int stringWidth = Math.Max(this.inherentWidth, (int)ModEntry.StringUtils.MeasureWord(Game1.dialogueFont, this.CurrentSelectedTranslatedOption));
+            int stringWidth = Math.Max(this.inherentWidth, (int)MathF.Ceiling(Game1.dialogueFont.MeasureString(this.CurrentSelectedTranslatedOption).X));
             drawTextureBox(
                 b,
                 texture: Graphics,
@@ -228,7 +223,7 @@ internal sealed class ForgeSelectionMenu : IClickableMenu
         }
         catch (Exception ex)
         {
-            ModEntry.ModMonitor.LogError("drawing smol menu", ex);
+            ModEntry.ModMonitor.Log($"Ran into difficulties trying to draw smol menu!\n{ex}", LogLevel.Error);
         }
     }
 

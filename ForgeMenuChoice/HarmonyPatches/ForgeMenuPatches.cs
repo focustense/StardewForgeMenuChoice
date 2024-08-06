@@ -1,15 +1,8 @@
-﻿using AtraShared.ConstantsAndEnums;
-using AtraShared.Utils.Extensions;
-
-using HarmonyLib;
-
+﻿using HarmonyLib;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-
 using StardewModdingAPI.Events;
 using StardewModdingAPI.Utilities;
-
-using StardewValley.Enchantments;
 using StardewValley.Menus;
 using StardewValley.Tools;
 
@@ -20,7 +13,6 @@ namespace ForgeMenuChoice.HarmonyPatches;
 /// </summary>
 /// <remarks>Also used to patch SpaceCore's forge menu.</remarks>
 [HarmonyPatch(typeof(ForgeMenu))]
-[SuppressMessage("StyleCop.CSharp.NamingRules", "SA1313:Parameter names should begin with lower-case letter", Justification = StyleCopConstants.NamedForHarmony)]
 internal static class ForgeMenuPatches
 {
     private static readonly PerScreen<List<BaseEnchantment>> PossibleEnchantmentPerscreen = new(() => new());
@@ -143,7 +135,7 @@ internal static class ForgeMenuPatches
         }
         catch (Exception ex)
         {
-            ModEntry.ModMonitor.LogError("postfixing IsValidCraft", ex);
+            ModEntry.ModMonitor.Log($"Error in postfixing IsValidCraft:\n{ex}", LogLevel.Error);
         }
         return true;
     }

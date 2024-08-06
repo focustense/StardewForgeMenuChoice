@@ -1,23 +1,18 @@
-﻿using AtraCore.Framework.Internal;
-
-using AtraShared.ConstantsAndEnums;
-using AtraShared.Integrations;
-using AtraShared.Utils;
-using AtraShared.Utils.Extensions;
-
-using ForgeMenuChoice.HarmonyPatches;
-
+﻿using ForgeMenuChoice.HarmonyPatches;
+using GenericModConfigMenu;
 using HarmonyLib;
-
 using StardewModdingAPI.Events;
-
-using AtraUtils = AtraShared.Utils.Utils;
 
 namespace ForgeMenuChoice;
 
 /// <inheritdoc/>
-internal sealed class ModEntry : BaseMod<ModEntry>
+internal sealed class ModEntry : Mod
 {
+    /// <summary>
+    /// Gets the logger for this file.
+    /// </summary>
+    internal static IMonitor ModMonitor { get; private set; } = null!;
+
     /// <summary>
     /// Gets the translation helper for this mod.
     /// </summary>
@@ -34,11 +29,6 @@ internal sealed class ModEntry : BaseMod<ModEntry>
     internal static IInputHelper InputHelper { get; private set; } = null!;
 
     /// <summary>
-    /// Gets the string utilities for this mod.
-    /// </summary>
-    internal static StringUtils StringUtils { get; private set; } = null!;
-
-    /// <summary>
     /// Gets a delegate that checks to see if the forge instance is Casey's NewForgeMenu or not.
     /// </summary>
     internal static Func<object, bool>? IsSpaceForge { get; private set; } = null;
@@ -46,15 +36,15 @@ internal sealed class ModEntry : BaseMod<ModEntry>
     /// <inheritdoc/>
     public override void Entry(IModHelper helper)
     {
-        I18n.Init(helper.Translation);
-        base.Entry(helper);
+        ModMonitor = this.Monitor;
 
-        StringUtils = new(this.Monitor);
+        I18n.Init(helper.Translation);
+
         TranslationHelper = helper.Translation;
         InputHelper = helper.Input;
 
         AssetLoader.Initialize(helper.GameContent);
-        Config = AtraUtils.GetConfigOrDefault<ModConfig>(helper, this.Monitor);
+        Config = helper.ReadConfig<ModConfig>();
 
         helper.Events.GameLoop.GameLaunched += this.OnGameLaunched;
 
@@ -72,14 +62,16 @@ internal sealed class ModEntry : BaseMod<ModEntry>
     {
         this.ApplyPatches(new Harmony(this.ModManifest.UniqueID));
 
-        GMCMHelper helper = new(this.Monitor, this.Helper.Translation, this.Helper.ModRegistry, this.ModManifest);
-        if (helper.TryGetAPI())
+        var gmcm = this.Helper.ModRegistry.GetApi<IGenericModConfigMenuApi>("spacechase0.GenericModConfigMenu");
+        if (gmcm is not null)
         {
-            helper.Register(
-                reset: static () => Config = new ModConfig(),
-                save: () => this.Helper.AsyncWriteConfig(this.Monitor, Config))
-            .AddParagraph(I18n.ModDescription)
-            .GenerateDefaultGMCM(static () => Config);
+            ConfigMenu.Register(
+                gmcm,
+                this.ModManifest,
+                this.Helper.Translation,
+                static () => Config,
+                static () => Config = new ModConfig(),
+                () => this.Helper.WriteConfig(Config));
         }
     }
 
@@ -88,16 +80,10 @@ internal sealed class ModEntry : BaseMod<ModEntry>
         try
         {
             harmony.PatchAll(typeof(ModEntry).Assembly);
-
-            if (this.Helper.ModRegistry.Get("Goldenrevolver.EnchantableScythes") is IModInfo sycthes)
-            {
-                this.Monitor.Log("Applying compat patches for Enchantable Scythes.", LogLevel.Debug);
-                GetEnchantmentPatch.ApplyPatch(harmony);
-            }
         }
         catch (Exception ex)
         {
-            ModMonitor.Log(string.Format(ErrorMessageConsts.HARMONYCRASH, ex), LogLevel.Error);
+            ModMonitor.Log(string.Format("Mod crashed while applying harmony patches:\n\n{0}", ex), LogLevel.Error);
         }
         harmony.Snitch(this.Monitor, harmony.Id, transpilersOnly: true);
     }
@@ -114,8 +100,12 @@ internal sealed class ModEntry : BaseMod<ModEntry>
 
     private void OnLocaleChanged(object? sender, LocaleChangedEventArgs e)
     {
-        this.Helper.GameContent.InvalidateCacheAndLocalized(AssetLoader.ENCHANTMENT_NAMES_LOCATION);
-
+        var content = this.Helper.GameContent;
+        content.InvalidateCache(AssetLoader.ENCHANTMENT_NAMES_LOCATION);
+        if (content.CurrentLocaleConstant != LocalizedContentManager.LanguageCode.en)
+        {
+            content.InvalidateCache($"{AssetLoader.ENCHANTMENT_NAMES_LOCATION}.{content.CurrentLocale}");
+        }
         AssetLoader.Refresh();
     }
 
