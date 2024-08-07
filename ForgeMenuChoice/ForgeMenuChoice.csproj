@@ -10,13 +10,13 @@
   </PropertyGroup>
   
   <PropertyGroup>
-	<Authors>atravita</Authors>
+	<Authors>focustense</Authors>
 	<MinimumApiVersion>4.0.5</MinimumApiVersion>
 	<UniqueId>$(Authors).$(AssemblyName)</UniqueId>
 	<EntryDll>$(AssemblyName).dll</EntryDll>
 	<Name>Pick Your Enchantment</Name>
 	<Description>Allows you to pick which enchantment you get.</Description>
-	<UpdateKeys> Nexus:11376, ModDrop:1125882 </UpdateKeys>
+	<UpdateKeys> Nexus:26803 </UpdateKeys>
 	<Version>1.2.0</Version>
   </PropertyGroup>
 
