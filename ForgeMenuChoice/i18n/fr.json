@@ -1,0 +1,21 @@
+{
+  "IllFormatedConfig": "Le fichier config.json est mal formaté, les paramètres par défaut sont activés. Installez le mod Generic Mod Config Menu pour paramétrer le mod.",
+  "api-not-found": "{{APIID}} introuvable, mod désactivé.",
+  "api-too-old": "Mettez à jour {{apiName}}({{APIID}}) version {{minversion}} minimum. Dernière version à jour : {{currentversion}}. Mod désactivé.",
+
+  // GMCM
+  "mod-description": "Vous permet de choisir l'enchantement à la forge naine.",
+  "TooltipBehavior.title": "Description des enchantements",
+  "TooltipBehavior.description": "Si cette option est activée, la description de l'enchantement apparait dans une infobulle lorsque vous survolez son nom avec le curseur. Option « Immersif » : les descriptions n'apparaissent que lorsque vous avez trouvé la page de journal 8.",
+  "config.TooltipBehavior.On": "Activé",
+  "config.TooltipBehavior.Off": "Désactivé",
+  "config.TooltipBehavior.Immersive": "Immersif",
+  "EnableTooltipAutogeneration.title": "Descriptions du jeu de base",
+  "EnableTooltipAutogeneration.description": "Les descriptions des enchantements reprennent celles de la page de journal 8. Désactivez cette option si un mod modifie ces descriptions.",
+  "LeftArrow.title": "Flèche gauche",
+  "LeftArrow.description": "Choix du bouton permettant de passer d'un enchantement à l'autre vers la gauche dans le menu de la forge.",
+  "RightArrow.title": "Flèche droite",
+  "RightArrow.description": "Choix du bouton permettant de passer d'un enchantement à l'autre vers la gauche dans le menu de la forge.",
+  "OverrideInnateEnchantments.title": "Enchantements innés",
+  "OverrideInnateEnchantments.description": "Si cette option est activée, les enchantements innés des armes (poids, défense, collectionneur de slime) seront disponibles."
+}
